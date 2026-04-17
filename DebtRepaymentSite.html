@@ -1,0 +1,1315 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debt Paydown Planner</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --color-primary: #2563eb;
+      --color-primary-hover: #1d4ed8;
+      --color-danger: #dc2626;
+      --color-danger-hover: #b91c1c;
+      --color-success: #16a34a;
+      --color-bg: #f1f5f9;
+      --color-card: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #1e293b;
+      --color-text-muted: #64748b;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.5;
+      padding: 1rem;
+    }
+
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    header h1 { font-size: 1.75rem; font-weight: 700; }
+    header p { color: var(--color-text-muted); font-size: 0.9rem; }
+
+
+    /* Dollar bill icon */
+    .drawer-toggle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      border-radius: var(--radius);
+      transition: transform 0.15s;
+      overflow: hidden;
+    }
+    .drawer-toggle:hover { transform: scale(1.1); }
+
+
+    @keyframes icon-shimmer {
+      0%   { left: -60%; }
+      100% { left: 130%; }
+    }
+
+
+    .drawer-toggle.shimmer::after {
+      content: '';
+      position: absolute;
+      top: -10%;
+      left: -60%;
+      width: 50%;
+      height: 120%;
+      background: linear-gradient(
+        105deg,
+        rgba(255,255,255,0)   0%,
+        rgba(255,255,255,0.85) 50%,
+        rgba(255,255,255,0)   100%
+      );
+      transform: skewX(-15deg);
+      animation: icon-shimmer 0.8s ease-in-out;
+      pointer-events: none;
+    }
+
+
+    /* Mobile drawer */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 200;
+    }
+    .drawer-overlay.open { display: block; }
+
+
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 300px;
+      max-width: 85vw;
+      background: var(--color-card);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+    }
+    .drawer-panel.open { transform: translateX(0); }
+
+
+    .drawer-close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      line-height: 1;
+      border-radius: var(--radius);
+    }
+    .drawer-close:hover { color: var(--color-text); background: var(--color-bg); }
+
+
+    .drawer-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      padding-top: 2.5rem;
+    }
+
+
+    .drawer-content .sidebar-top {
+      flex: 3;
+      overflow-y: auto;
+    }
+
+
+    .drawer-content .sidebar-bottom {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+
+    /* Hide drawer on desktop, hide toggle icon on desktop */
+    .drawer-panel, .drawer-overlay { /* default: available */ }
+
+
+    @media (min-width: 641px) {
+      .drawer-toggle { cursor: default; }
+      .drawer-toggle:hover { transform: none; }
+      .drawer-panel { display: none !important; }
+      .drawer-overlay { display: none !important; }
+    }
+
+
+    .card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+    }
+
+
+    .subsection-heading {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-border);
+    }
+
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 0.5rem;
+      align-items: end;
+    }
+
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem 0.6rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+
+    .form-group input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+
+    .form-actions {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.75rem;
+    }
+
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+
+    .btn-primary { background: var(--color-primary); color: #fff; }
+    .btn-primary:hover { background: var(--color-primary-hover); }
+    .btn-danger { background: var(--color-danger); color: #fff; }
+    .btn-danger:hover { background: var(--color-danger-hover); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+    }
+    .btn-ghost:hover { background: var(--color-bg); }
+    .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.78rem; }
+
+
+    #cancel-edit { display: none; }
+
+
+    .warning {
+      color: var(--color-danger);
+      font-size: 0.82rem;
+      margin-top: 0.4rem;
+      display: none;
+    }
+
+
+    /* Strategy picker */
+    .strategy-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+
+    .strategy-options label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+
+    /* Account list */
+    #account-list {
+      list-style: none;
+      min-height: 2rem;
+    }
+
+
+    #account-list:not(:empty) {
+      margin-bottom: 1rem;
+    }
+
+
+    .account-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      margin-bottom: 0.4rem;
+      background: var(--color-card);
+      cursor: grab;
+      transition: opacity 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+
+
+    .account-item:active { cursor: grabbing; }
+    .account-item.dragging { opacity: 0.35; }
+    .account-item.drag-over { box-shadow: 0 -2px 0 0 var(--color-primary); }
+
+
+    .account-item .grip {
+      color: var(--color-text-muted);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+
+    .account-item .account-name {
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+
+    .account-item .account-detail {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+
+    .account-item .account-actions {
+      display: flex;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+
+
+    /* Run button */
+    #run-btn {
+      width: 100%;
+      padding: 0.7rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+
+    /* Results */
+    #results-section { display: none; }
+
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+
+    .results-header h2 { margin-bottom: 0; }
+
+
+    #back-btn { display: none; }
+
+
+    .results-layout {
+      display: flex;
+      gap: 1.25rem;
+      align-items: stretch;
+    }
+
+
+    .summary-column {
+      flex: 0 0 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+
+    .chart-column {
+      flex: 1;
+      min-width: 0;
+    }
+
+
+    .stat-card {
+      text-align: center;
+      padding: 0.65rem 0.75rem;
+      background: var(--color-bg);
+      border-radius: var(--radius);
+    }
+
+
+    .stat-card .stat-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+
+    .stat-card .stat-label {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+    }
+
+
+    .chart-container {
+      position: relative;
+      height: 420px;
+    }
+
+
+    /* Page layout with sidebar (desktop only) */
+    .page-layout {
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+
+
+    .main-column {
+      flex: 1;
+      min-width: 0;
+    }
+
+
+    .sidebar {
+      flex: 0 0 280px;
+      position: sticky;
+      top: 1rem;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      background: var(--color-card);
+      height: calc(100vh - 2rem);
+      overflow: hidden;
+    }
+
+
+    .sidebar-top {
+      flex: 3;
+      padding: 1rem;
+      overflow-y: auto;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 0.88rem;
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+
+
+    .sidebar-bottom {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+
+    /* Info modal (mobile first-run only) */
+    .info-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .info-modal-overlay.open { display: flex; }
+
+
+    .info-modal {
+      background: var(--color-card);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      max-width: 420px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      max-height: 80vh;
+      overflow: hidden;
+    }
+
+
+    .info-modal-body {
+      padding: 1.25rem 1.25rem 0;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+
+
+    .info-modal-footer {
+      padding: 1rem 1.25rem 1.25rem;
+      flex-shrink: 0;
+    }
+
+
+    .info-modal-footer .btn {
+      width: 100%;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .sidebar { display: none; }
+      .page-layout { flex-direction: column; }
+      body { padding: 0.5rem; }
+
+
+      header h1 { font-size: 1.35rem; }
+      header p { font-size: 0.82rem; }
+
+
+      .card { padding: 0.9rem; margin-bottom: 0.75rem; }
+      .card h2 { font-size: 1rem; }
+
+
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+      }
+      .form-group label { font-size: 0.75rem; }
+      .form-group input { padding: 0.45rem 0.5rem; font-size: 0.85rem; }
+
+
+      .account-item {
+        flex-wrap: wrap;
+        padding: 0.5rem 0.6rem;
+        gap: 0.4rem;
+      }
+      .account-item .grip { font-size: 0.85rem; }
+      .account-item .account-name { font-size: 0.88rem; flex-basis: calc(100% - 2rem); }
+      .account-item .account-detail { font-size: 0.75rem; }
+      .account-item .account-actions { margin-left: auto; }
+
+
+      .strategy-options { flex-direction: column; gap: 0.5rem; }
+      .strategy-options label { font-size: 0.82rem; }
+
+
+      .subsection-heading { font-size: 0.88rem; margin-top: 1rem; }
+
+
+      /* Mobile fullscreen results */
+      #results-section.mobile-focus {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        margin: 0;
+        border-radius: 0;
+        border: none;
+        overflow-y: auto;
+        padding: 1rem;
+        display: block;
+      }
+
+
+      #back-btn { display: inline-block; }
+
+
+      .results-layout {
+        flex-direction: column;
+      }
+      .summary-column {
+        flex: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      .stat-card { padding: 0.5rem; }
+      .stat-card .stat-value { font-size: 1rem; }
+      .stat-card .stat-label { font-size: 0.7rem; }
+
+
+      .chart-container {
+        height: 280px;
+      }
+
+
+      #run-btn { font-size: 0.9rem; padding: 0.6rem; }
+
+
+      .mobile-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--color-card);
+        border-top: 1px solid var(--color-border);
+        padding: 0.65rem 1rem 1.25rem;
+        font-size: 0.82rem;
+        color: var(--color-text-muted);
+        line-height: 1.5;
+        z-index: 10;
+      }
+
+
+      body { padding-bottom: 3.5rem; }
+    }
+
+
+    /* Hide mobile footer on desktop */
+    @media (min-width: 641px) {
+      .mobile-footer { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+
+<header>
+  <button id="drawer-toggle" class="drawer-toggle" aria-label="Open info panel">
+    <svg viewBox="0 0 64 32" width="40" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="1" y="1" width="62" height="30" rx="4" fill="#85bb65" stroke="#5a8a3c" stroke-width="1.5"/>
+      <rect x="4" y="4" width="56" height="24" rx="2" fill="none" stroke="#5a8a3c" stroke-width="0.75" stroke-dasharray="2 1"/>
+      <circle cx="32" cy="16" r="8" fill="#6a9e4a" stroke="#5a8a3c" stroke-width="0.75"/>
+      <text x="32" y="20" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff" font-family="serif">$</text>
+    </svg>
+  </button>
+  <h1>Debt Paydown Planner</h1>
+  <p>Enter your debts, pick a strategy, and see your path to debt-freedom.</p>
+</header>
+
+
+<div id="drawer-overlay" class="drawer-overlay"></div>
+<div id="drawer-panel" class="drawer-panel">
+  <button id="drawer-close" class="drawer-close" aria-label="Close panel">&times;</button>
+  <div class="drawer-content">
+    <div class="sidebar-top">
+      <p>This panel will display detailed account-by-account breakdowns, including individual payoff dates, total interest per account, and monthly payment schedules. Use it to compare how different strategies affect each debt and to identify which accounts benefit most from accelerated payments.</p>
+    </div>
+  </div>
+</div>
+
+
+<footer id="mobile-footer" class="mobile-footer">
+  <p>Additional tips and insights will appear here based on your simulation results.</p>
+</footer>
+
+
+
+
+<div class="page-layout">
+  <div class="main-column">
+    <div class="card">
+      <h2>Setup Accounts</h2>
+      <ul id="account-list"></ul>
+      <form id="account-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="acc-name">Account Name</label>
+            <input type="text" id="acc-name" placeholder="e.g. Visa" required>
+          </div>
+          <div class="form-group">
+            <label for="acc-balance">Balance ($)</label>
+            <input type="number" id="acc-balance" placeholder="5000" min="0.01" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="acc-apr">APR (%)</label>
+            <input type="number" id="acc-apr" placeholder="21.9" min="0" step="any" required>
+          </div>
+          <div class="form-group">
+            <label for="acc-payment">Monthly Payment ($)</label>
+            <input type="number" id="acc-payment" placeholder="150" min="0.01" step="any" required>
+          </div>
+        </div>
+        <div class="warning" id="form-warning"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="form-submit-btn">Add Account</button>
+          <button type="button" class="btn btn-ghost" id="cancel-edit">Cancel</button>
+        </div>
+      </form>
+
+
+      <h3 class="subsection-heading">Payoff Strategy</h3>
+      <div class="strategy-options">
+        <label><input type="radio" name="strategy" value="highest-interest" checked> Highest Interest First (Avalanche)</label>
+        <label><input type="radio" name="strategy" value="lowest-balance"> Lowest Balance First (Snowball)</label>
+        <label><input type="radio" name="strategy" value="highest-balance"> Highest Balance First</label>
+      </div>
+    </div>
+
+
+    <div class="card">
+      <button id="run-btn" class="btn btn-primary">Run Simulation</button>
+    </div>
+
+
+    <div id="results-section" class="card">
+  <div class="results-header">
+    <h2>Results</h2>
+    <button id="back-btn" class="btn btn-ghost btn-sm">&#8592; Back to Setup</button>
+  </div>
+  <div class="results-layout">
+    <div class="summary-column" id="summary-stats"></div>
+    <div class="chart-column">
+      <div class="chart-container">
+        <canvas id="payoff-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  </div><!-- /.main-column -->
+
+
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <p>This panel will display detailed account-by-account breakdowns, including individual payoff dates, total interest per account, and monthly payment schedules. Use it to compare how different strategies affect each debt and to identify which accounts benefit most from accelerated payments.</p>
+    </div>
+    <div class="sidebar-bottom">
+      <p>Additional tips and insights will appear here based on your simulation results.</p>
+    </div>
+  </aside>
+</div><!-- /.page-layout -->
+
+
+<div id="info-modal-overlay" class="info-modal-overlay">
+  <div id="info-modal" class="info-modal">
+    <div class="info-modal-body">
+      <p>This panel will display detailed account-by-account breakdowns, including individual payoff dates, total interest per account, and monthly payment schedules. Use it to compare how different strategies affect each debt and to identify which accounts benefit most from accelerated payments.</p>
+    </div>
+    <div class="info-modal-footer">
+      <button id="info-modal-close" class="btn btn-primary">Hide (this won't pop up again)</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // --- State ---
+  let accounts = [];
+  let strategy = "highest-interest";
+  let editingId = null;
+  let payoffChart = null;
+
+
+  // --- Persistence ---
+  function saveState() {
+    localStorage.setItem("debtPlanner", JSON.stringify({ accounts, strategy }));
+  }
+
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem("debtPlanner");
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (Array.isArray(s.accounts)) accounts = s.accounts;
+      if (s.strategy) strategy = s.strategy;
+    } catch (e) { /* ignore corrupt data */ }
+  }
+
+
+  // --- DOM refs ---
+  const form = document.getElementById("account-form");
+  const nameInput = document.getElementById("acc-name");
+  const balanceInput = document.getElementById("acc-balance");
+  const aprInput = document.getElementById("acc-apr");
+  const paymentInput = document.getElementById("acc-payment");
+  const formWarning = document.getElementById("form-warning");
+  const submitBtn = document.getElementById("form-submit-btn");
+  const cancelBtn = document.getElementById("cancel-edit");
+  const accountList = document.getElementById("account-list");
+  const runBtn = document.getElementById("run-btn");
+  const resultsSection = document.getElementById("results-section");
+  const summaryStats = document.getElementById("summary-stats");
+
+
+  // --- Account CRUD ---
+  function addOrUpdateAccount() {
+    const name = nameInput.value.trim();
+    const balance = parseFloat(balanceInput.value);
+    const apr = parseFloat(aprInput.value) / 100;
+    const minPayment = parseFloat(paymentInput.value);
+
+
+    if (!name || isNaN(balance) || isNaN(apr) || isNaN(minPayment)) return;
+    if (balance <= 0 || minPayment <= 0 || apr < 0) return;
+
+
+    const monthlyInterest = balance * (apr / 12);
+    if (minPayment <= monthlyInterest && apr > 0) {
+      formWarning.textContent = `Warning: $${minPayment.toFixed(2)}/mo doesn\u2019t cover monthly interest of $${monthlyInterest.toFixed(2)}. This debt will never be paid off.`;
+      formWarning.style.display = "block";
+      return;
+    }
+
+
+    formWarning.style.display = "none";
+
+
+    if (editingId) {
+      const idx = accounts.findIndex(a => a.id === editingId);
+      if (idx !== -1) {
+        accounts[idx] = { ...accounts[idx], name, balance, apr, minPayment };
+      }
+      cancelEdit();
+    } else {
+      accounts.push({ id: crypto.randomUUID(), name, balance, apr, minPayment });
+    }
+
+
+    form.reset();
+    renderAccountList();
+    saveState();
+    form.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+
+  function deleteAccount(id) {
+    accounts = accounts.filter(a => a.id !== id);
+    renderAccountList();
+    saveState();
+  }
+
+
+  function startEdit(id) {
+    const acc = accounts.find(a => a.id === id);
+    if (!acc) return;
+    editingId = id;
+    nameInput.value = acc.name;
+    balanceInput.value = acc.balance;
+    aprInput.value = (acc.apr * 100).toFixed(2);
+    paymentInput.value = acc.minPayment;
+    submitBtn.textContent = "Update Account";
+    cancelBtn.style.display = "inline-block";
+    nameInput.focus();
+  }
+
+
+  function cancelEdit() {
+    editingId = null;
+    form.reset();
+    submitBtn.textContent = "Add Account";
+    cancelBtn.style.display = "none";
+    formWarning.style.display = "none";
+  }
+
+
+  // --- Render Account List ---
+  function renderAccountList() {
+    accountList.innerHTML = "";
+    accounts.forEach(acc => {
+      const li = document.createElement("li");
+      li.className = "account-item";
+      li.draggable = true;
+      li.dataset.id = acc.id;
+      li.innerHTML = `
+        <span class="grip">&#x2630;</span>
+        <span class="account-name">${escapeHtml(acc.name)}</span>
+        <span class="account-detail">$${acc.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+        <span class="account-detail">${(acc.apr * 100).toFixed(2)}%</span>
+        <span class="account-detail">$${acc.minPayment.toFixed(2)}/mo</span>
+        <span class="account-actions">
+          <button class="btn btn-ghost btn-sm btn-edit">Edit</button>
+          <button class="btn btn-danger btn-sm btn-delete">Del</button>
+        </span>
+      `;
+      accountList.appendChild(li);
+    });
+  }
+
+
+  function escapeHtml(str) {
+    const d = document.createElement("div");
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+
+  // --- Drag and Drop ---
+  let dragId = null;
+
+
+  accountList.addEventListener("dragstart", e => {
+    const li = e.target.closest(".account-item");
+    if (!li) return;
+    dragId = li.dataset.id;
+    li.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+  });
+
+
+  accountList.addEventListener("dragend", e => {
+    const li = e.target.closest(".account-item");
+    if (li) li.classList.remove("dragging");
+    accountList.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+    dragId = null;
+  });
+
+
+  accountList.addEventListener("dragover", e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    const afterEl = getDragAfterElement(accountList, e.clientY);
+    accountList.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
+    if (afterEl) {
+      afterEl.classList.add("drag-over");
+    }
+  });
+
+
+  accountList.addEventListener("drop", e => {
+    e.preventDefault();
+    if (!dragId) return;
+    const afterEl = getDragAfterElement(accountList, e.clientY);
+    const dragIndex = accounts.findIndex(a => a.id === dragId);
+    if (dragIndex === -1) return;
+
+
+    const [moved] = accounts.splice(dragIndex, 1);
+
+
+    if (afterEl) {
+      const afterId = afterEl.dataset.id;
+      const afterIndex = accounts.findIndex(a => a.id === afterId);
+      accounts.splice(afterIndex, 0, moved);
+    } else {
+      accounts.push(moved);
+    }
+
+
+    renderAccountList();
+    saveState();
+  });
+
+
+  function getDragAfterElement(container, y) {
+    const items = [...container.querySelectorAll(".account-item:not(.dragging)")];
+    let closest = null;
+    let closestOffset = Number.NEGATIVE_INFINITY;
+
+
+    for (const item of items) {
+      const box = item.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closestOffset) {
+        closestOffset = offset;
+        closest = item;
+      }
+    }
+    return closest;
+  }
+
+
+  // --- Event delegation for edit/delete ---
+  accountList.addEventListener("click", e => {
+    const li = e.target.closest(".account-item");
+    if (!li) return;
+    const id = li.dataset.id;
+    if (e.target.matches(".btn-delete")) deleteAccount(id);
+    if (e.target.matches(".btn-edit")) startEdit(id);
+  });
+
+
+  // --- Simulation Engine ---
+  function runSimulation(accs, strat) {
+    const debts = accs.map(a => ({ ...a, paid: false }));
+    const prioritized = sortByStrategy(debts, strat);
+
+
+    const timeline = [];
+    let totalInterest = 0;
+    let month = 0;
+    const MAX_MONTHS = 600;
+
+
+    timeline.push(snapshot(month, prioritized));
+
+
+    while (hasUnpaidDebts(prioritized) && month < MAX_MONTHS) {
+      month++;
+
+
+      // Phase 1: accrue interest
+      for (const d of prioritized) {
+        if (d.paid) continue;
+        const interest = d.balance * (d.apr / 12);
+        d.balance += interest;
+        totalInterest += interest;
+      }
+
+
+      // Phase 2: apply payments in priority order
+      // Every unpaid account makes its minimum payment.
+      // Freed-up payments from paid-off accounts roll into
+      // the highest-priority unpaid account (snowball/avalanche).
+      let rollover = 0;
+      let firstUnpaid = true;
+      for (const d of prioritized) {
+        if (d.paid) {
+          rollover += d.minPayment;
+          continue;
+        }
+
+
+        let payment = d.minPayment;
+        if (firstUnpaid) {
+          payment += rollover;
+          rollover = 0;
+          firstUnpaid = false;
+        }
+
+
+        if (payment >= d.balance) {
+          rollover += payment - d.balance;
+          d.balance = 0;
+          d.paid = true;
+        } else {
+          d.balance -= payment;
+        }
+      }
+
+
+      timeline.push(snapshot(month, prioritized));
+    }
+
+
+    const accountNames = {};
+    for (const a of accs) accountNames[a.id] = a.name;
+
+
+    return { timeline, totalInterest, totalMonths: month, accountNames };
+  }
+
+
+  function sortByStrategy(debts, strat) {
+    const copy = [...debts];
+    switch (strat) {
+      case "highest-interest": copy.sort((a, b) => b.apr - a.apr); break;
+      case "lowest-balance":   copy.sort((a, b) => a.balance - b.balance); break;
+      case "highest-balance":  copy.sort((a, b) => b.balance - a.balance); break;
+    }
+    return copy;
+  }
+
+
+  function snapshot(month, debts) {
+    const balances = {};
+    for (const d of debts) balances[d.id] = Math.max(0, parseFloat(d.balance.toFixed(2)));
+    return { month, balances };
+  }
+
+
+  function hasUnpaidDebts(debts) {
+    return debts.some(d => !d.paid);
+  }
+
+
+  // --- Chart Rendering ---
+  const COLORS = [
+    "#2563eb", "#dc2626", "#16a34a", "#f59e0b", "#8b5cf6",
+    "#ec4899", "#06b6d4", "#f97316", "#6366f1", "#14b8a6"
+  ];
+
+
+  function renderChart(result) {
+    const { timeline, accountNames } = result;
+    const ids = Object.keys(timeline[0].balances);
+
+
+    const datasets = ids.map((id, i) => ({
+      label: accountNames[id],
+      data: timeline.map(t => t.balances[id]),
+      borderColor: COLORS[i % COLORS.length],
+      backgroundColor: COLORS[i % COLORS.length] + "18",
+      fill: false,
+      tension: 0.15,
+      pointRadius: 0,
+      pointHitRadius: 8,
+      borderWidth: 2.5
+    }));
+
+
+    if (payoffChart) payoffChart.destroy();
+
+
+    payoffChart = new Chart(document.getElementById("payoff-chart"), {
+      type: "line",
+      data: {
+        labels: timeline.map(t => t.month),
+        datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              title: ctx => `Month ${ctx[0].label}`,
+              label: ctx => `${ctx.dataset.label}: $${ctx.parsed.y.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+            }
+          },
+          legend: { position: "bottom" }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: "Month" },
+            ticks: { maxTicksLimit: 24 }
+          },
+          y: {
+            title: { display: true, text: "Balance ($)" },
+            beginAtZero: true,
+            ticks: {
+              callback: v => "$" + v.toLocaleString()
+            }
+          }
+        }
+      }
+    });
+  }
+
+
+  // --- Summary ---
+  function renderSummary(result) {
+    const { totalMonths, totalInterest } = result;
+    const startingDebt = accounts.reduce((s, a) => s + a.balance, 0);
+    const totalPaid = startingDebt + totalInterest;
+
+
+    const freeDate = new Date();
+    freeDate.setMonth(freeDate.getMonth() + totalMonths);
+    const dateStr = freeDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+
+    summaryStats.innerHTML = `
+      <div class="stat-card">
+        <div class="stat-value">${totalMonths}</div>
+        <div class="stat-label">Months to Debt-Free</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${dateStr}</div>
+        <div class="stat-label">Debt-Free Date</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">$${startingDebt.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div class="stat-label">Starting Debt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">$${totalInterest.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div class="stat-label">Total Interest Paid</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">$${totalPaid.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+        <div class="stat-label">Total Amount Paid</div>
+      </div>
+    `;
+  }
+
+
+  // --- Event Wiring ---
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    addOrUpdateAccount();
+  });
+
+
+  cancelBtn.addEventListener("click", cancelEdit);
+
+
+  document.querySelectorAll('input[name="strategy"]').forEach(r => {
+    r.addEventListener("change", e => {
+      strategy = e.target.value;
+      accounts = sortByStrategy(accounts, strategy);
+      renderAccountList();
+      saveState();
+    });
+  });
+
+
+  function isMobile() {
+    return window.matchMedia("(max-width: 640px)").matches;
+  }
+
+
+  // --- Info Modal ---
+  const infoModalOverlay = document.getElementById("info-modal-overlay");
+  const infoModalClose = document.getElementById("info-modal-close");
+
+
+  function hasSeenInfoModal() {
+    return localStorage.getItem("debtPlanner_infoSeen") === "true";
+  }
+
+
+  function markInfoModalSeen() {
+    localStorage.setItem("debtPlanner_infoSeen", "true");
+  }
+
+
+  function showInfoModal(onDismiss) {
+    infoModalOverlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+
+
+    function dismiss() {
+      infoModalOverlay.classList.remove("open");
+      markInfoModalSeen();
+      infoModalClose.removeEventListener("click", dismiss);
+      onDismiss();
+    }
+
+
+    infoModalClose.addEventListener("click", dismiss);
+  }
+
+
+  runBtn.addEventListener("click", () => {
+    if (accounts.length === 0) {
+      alert("Add at least one debt account first.");
+      return;
+    }
+    const result = runSimulation(accounts, strategy);
+    renderSummary(result);
+    renderChart(result);
+
+
+    if (isMobile()) {
+      const icon = document.getElementById("drawer-toggle");
+      icon.classList.remove("shimmer");
+      void icon.offsetWidth;
+      icon.classList.add("shimmer");
+
+
+      icon.addEventListener("animationend", () => {
+        icon.classList.remove("shimmer");
+        if (!hasSeenInfoModal()) {
+          showInfoModal(() => {
+            resultsSection.style.display = "block";
+            resultsSection.classList.add("mobile-focus");
+            document.body.style.overflow = "hidden";
+          });
+        } else {
+          resultsSection.style.display = "block";
+          resultsSection.classList.add("mobile-focus");
+          document.body.style.overflow = "hidden";
+        }
+      }, { once: true });
+    } else {
+      resultsSection.style.display = "block";
+      resultsSection.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+
+
+  document.getElementById("back-btn").addEventListener("click", () => {
+    resultsSection.classList.remove("mobile-focus");
+    document.body.style.overflow = "";
+  });
+
+
+  // --- Mobile Drawer ---
+  const drawerToggle = document.getElementById("drawer-toggle");
+  const drawerPanel = document.getElementById("drawer-panel");
+  const drawerOverlay = document.getElementById("drawer-overlay");
+  const drawerClose = document.getElementById("drawer-close");
+
+
+  function openDrawer() {
+    if (!isMobile()) return;
+    drawerPanel.classList.add("open");
+    drawerOverlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+
+  function closeDrawer() {
+    drawerPanel.classList.remove("open");
+    drawerOverlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+
+  drawerToggle.addEventListener("click", openDrawer);
+  drawerClose.addEventListener("click", closeDrawer);
+  drawerOverlay.addEventListener("click", closeDrawer);
+
+
+  // --- Init ---
+  loadState();
+  const stratRadio = document.querySelector(`input[name="strategy"][value="${strategy}"]`);
+  if (stratRadio) stratRadio.checked = true;
+  renderAccountList();
+
+
+  if (isMobile()) {
+    const icon = document.getElementById("drawer-toggle");
+    icon.classList.add("shimmer");
+    icon.addEventListener("animationend", () => icon.classList.remove("shimmer"), { once: true });
+  }
+</script>
+</body>
+</html>
