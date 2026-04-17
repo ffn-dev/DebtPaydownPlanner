@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -21,9 +21,7 @@
       --shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -33,7 +31,6 @@
       padding: 1rem;
     }
 
-
     header {
       text-align: center;
       margin-bottom: 1.5rem;
@@ -41,7 +38,6 @@
     }
     header h1 { font-size: 1.75rem; font-weight: 700; }
     header p { color: var(--color-text-muted); font-size: 0.9rem; }
-
 
     /* Dollar bill icon */
     .drawer-toggle {
@@ -58,12 +54,10 @@
     }
     .drawer-toggle:hover { transform: scale(1.1); }
 
-
     @keyframes icon-shimmer {
       0%   { left: -60%; }
       100% { left: 130%; }
     }
-
 
     .drawer-toggle.shimmer::after {
       content: '';
@@ -83,7 +77,6 @@
       pointer-events: none;
     }
 
-
     /* Mobile drawer */
     .drawer-overlay {
       display: none;
@@ -93,7 +86,6 @@
       z-index: 200;
     }
     .drawer-overlay.open { display: block; }
-
 
     .drawer-panel {
       position: fixed;
@@ -112,7 +104,6 @@
     }
     .drawer-panel.open { transform: translateX(0); }
 
-
     .drawer-close {
       position: absolute;
       top: 0.5rem;
@@ -128,7 +119,6 @@
     }
     .drawer-close:hover { color: var(--color-text); background: var(--color-bg); }
 
-
     .drawer-content {
       display: flex;
       flex-direction: column;
@@ -137,30 +127,27 @@
       padding-top: 2.5rem;
     }
 
-
     .drawer-content .sidebar-top {
       flex: 3;
       overflow-y: auto;
     }
-
 
     .drawer-content .sidebar-bottom {
       flex: 1;
       overflow-y: auto;
     }
 
-
     /* Hide drawer on desktop, hide toggle icon on desktop */
     .drawer-panel, .drawer-overlay { /* default: available */ }
-
 
     @media (min-width: 641px) {
       .drawer-toggle { cursor: default; }
       .drawer-toggle:hover { transform: none; }
+      .drawer-toggle.desktop-active { cursor: pointer; }
+      .drawer-toggle.desktop-active:hover { transform: scale(1.1); }
       .drawer-panel { display: none !important; }
       .drawer-overlay { display: none !important; }
     }
-
 
     .card {
       background: var(--color-card);
@@ -171,13 +158,11 @@
       margin-bottom: 1.25rem;
     }
 
-
     .card h2 {
       font-size: 1.1rem;
       margin-bottom: 0.75rem;
       font-weight: 600;
     }
-
 
     .subsection-heading {
       font-size: 0.95rem;
@@ -188,7 +173,6 @@
       border-top: 1px solid var(--color-border);
     }
 
-
     /* Form */
     .form-grid {
       display: grid;
@@ -197,7 +181,6 @@
       align-items: end;
     }
 
-
     .form-group label {
       display: block;
       font-size: 0.8rem;
@@ -205,7 +188,6 @@
       color: var(--color-text-muted);
       margin-bottom: 0.2rem;
     }
-
 
     .form-group input {
       width: 100%;
@@ -217,19 +199,16 @@
       transition: border-color 0.15s;
     }
 
-
     .form-group input:focus {
       border-color: var(--color-primary);
       box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
     }
-
 
     .form-actions {
       display: flex;
       gap: 0.4rem;
       margin-top: 0.75rem;
     }
-
 
     .btn {
       padding: 0.5rem 1rem;
@@ -240,7 +219,6 @@
       cursor: pointer;
       transition: background 0.15s;
     }
-
 
     .btn-primary { background: var(--color-primary); color: #fff; }
     .btn-primary:hover { background: var(--color-primary-hover); }
@@ -254,9 +232,7 @@
     .btn-ghost:hover { background: var(--color-bg); }
     .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.78rem; }
 
-
     #cancel-edit { display: none; }
-
 
     .warning {
       color: var(--color-danger);
@@ -265,14 +241,12 @@
       display: none;
     }
 
-
     /* Strategy picker */
     .strategy-options {
       display: flex;
       flex-wrap: wrap;
       gap: 0.75rem;
     }
-
 
     .strategy-options label {
       display: flex;
@@ -282,6 +256,66 @@
       cursor: pointer;
     }
 
+    .strategy-custom {
+      color: var(--color-text-muted);
+      cursor: pointer;
+      font-style: italic;
+    }
+
+    .custom-info-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 0.2rem;
+    }
+
+    .custom-info-icon {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: var(--color-text-muted);
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .custom-info-icon:hover { color: var(--color-primary); }
+
+    .custom-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-text);
+      color: #fff;
+      font-size: 0.78rem;
+      font-style: normal;
+      font-weight: 400;
+      white-space: nowrap;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    .custom-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--color-text);
+    }
+
+    /* Hover shows tooltip */
+    .custom-info-wrap:hover .custom-tooltip,
+    .custom-tooltip.pinned {
+      display: block;
+    }
 
     /* Account list */
     #account-list {
@@ -289,11 +323,9 @@
       min-height: 2rem;
     }
 
-
     #account-list:not(:empty) {
       margin-bottom: 1rem;
     }
-
 
     .account-item {
       display: flex;
@@ -309,18 +341,15 @@
       user-select: none;
     }
 
-
     .account-item:active { cursor: grabbing; }
     .account-item.dragging { opacity: 0.35; }
     .account-item.drag-over { box-shadow: 0 -2px 0 0 var(--color-primary); }
-
 
     .account-item .grip {
       color: var(--color-text-muted);
       font-size: 1rem;
       flex-shrink: 0;
     }
-
 
     .account-item .account-name {
       font-weight: 600;
@@ -331,13 +360,11 @@
       white-space: nowrap;
     }
 
-
     .account-item .account-detail {
       font-size: 0.82rem;
       color: var(--color-text-muted);
       white-space: nowrap;
     }
-
 
     .account-item .account-actions {
       display: flex;
@@ -345,19 +372,21 @@
       flex-shrink: 0;
     }
 
-
-    /* Run button */
-    #run-btn {
-      width: 100%;
+    /* Action button row */
+    .action-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .action-btns .btn {
+      flex: 1;
       padding: 0.7rem;
       font-size: 1rem;
       font-weight: 600;
+      text-align: center;
     }
-
 
     /* Results */
     #results-section { display: none; }
-
 
     .results-header {
       display: flex;
@@ -366,19 +395,15 @@
       margin-bottom: 0.75rem;
     }
 
-
     .results-header h2 { margin-bottom: 0; }
 
-
     #back-btn { display: none; }
-
 
     .results-layout {
       display: flex;
       gap: 1.25rem;
       align-items: stretch;
     }
-
 
     .summary-column {
       flex: 0 0 200px;
@@ -387,12 +412,10 @@
       gap: 0.6rem;
     }
 
-
     .chart-column {
       flex: 1;
       min-width: 0;
     }
-
 
     .stat-card {
       text-align: center;
@@ -401,25 +424,75 @@
       border-radius: var(--radius);
     }
 
-
     .stat-card .stat-value {
       font-size: 1.15rem;
       font-weight: 700;
       color: var(--color-primary);
     }
 
-
     .stat-card .stat-label {
       font-size: 0.75rem;
       color: var(--color-text-muted);
     }
-
 
     .chart-container {
       position: relative;
       height: 420px;
     }
 
+    /* Comparison view */
+    .comparison-grid {
+      display: flex;
+      gap: 0.85rem;
+      overflow-x: auto;
+      padding-bottom: 0.25rem;
+    }
+    .comparison-panel {
+      flex: 1;
+      min-width: 160px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .comparison-panel-header {
+      padding: 0.55rem 0.75rem;
+      text-align: center;
+      color: #fff;
+    }
+    .comparison-panel-header .strategy-name {
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .comparison-panel-header .strategy-sublabel {
+      font-size: 0.72rem;
+      opacity: 0.85;
+      font-style: italic;
+    }
+    .comparison-panel-stats {
+      padding: 0.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: var(--color-card);
+    }
+    .comparison-stat {
+      padding: 0.45rem 0.5rem;
+      background: var(--color-bg);
+      border-radius: calc(var(--radius) - 2px);
+      text-align: center;
+    }
+    .comparison-stat .stat-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+    .comparison-stat .stat-label {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+    }
+    .comparison-panel.best-panel {
+      box-shadow: 0 0 0 2px var(--color-success);
+    }
 
     /* Page layout with sidebar (desktop only) */
     .page-layout {
@@ -428,12 +501,10 @@
       align-items: flex-start;
     }
 
-
     .main-column {
       flex: 1;
       min-width: 0;
     }
-
 
     .sidebar {
       flex: 0 0 280px;
@@ -448,17 +519,15 @@
       overflow: hidden;
     }
 
-
     .sidebar-top {
       flex: 3;
-      padding: 1rem;
+      padding: 2.5rem 1rem 1rem;
       overflow-y: auto;
       border-bottom: 1px solid var(--color-border);
       font-size: 0.88rem;
       color: var(--color-text);
       line-height: 1.6;
     }
-
 
     .sidebar-bottom {
       flex: 1;
@@ -469,6 +538,24 @@
       line-height: 1.5;
     }
 
+    .sidebar-close-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      line-height: 1;
+      border-radius: var(--radius);
+      transition: color 0.15s, background 0.15s;
+    }
+    .sidebar-close-btn:hover {
+      color: var(--color-text);
+      background: var(--color-bg);
+    }
 
     /* Info modal (mobile first-run only) */
     .info-modal-overlay {
@@ -483,7 +570,6 @@
     }
     .info-modal-overlay.open { display: flex; }
 
-
     .info-modal {
       background: var(--color-card);
       border-radius: var(--radius);
@@ -496,7 +582,6 @@
       overflow: hidden;
     }
 
-
     .info-modal-body {
       padding: 1.25rem 1.25rem 0;
       overflow-y: auto;
@@ -505,12 +590,10 @@
       color: var(--color-text);
     }
 
-
     .info-modal-footer {
       padding: 1rem 1.25rem 1.25rem;
       flex-shrink: 0;
     }
-
 
     .info-modal-footer .btn {
       width: 100%;
@@ -518,21 +601,17 @@
       font-size: 0.85rem;
     }
 
-
     /* Responsive */
     @media (max-width: 640px) {
       .sidebar { display: none; }
       .page-layout { flex-direction: column; }
       body { padding: 0.5rem; }
 
-
       header h1 { font-size: 1.35rem; }
       header p { font-size: 0.82rem; }
 
-
       .card { padding: 0.9rem; margin-bottom: 0.75rem; }
       .card h2 { font-size: 1rem; }
-
 
       .form-grid {
         grid-template-columns: 1fr 1fr;
@@ -540,7 +619,6 @@
       }
       .form-group label { font-size: 0.75rem; }
       .form-group input { padding: 0.45rem 0.5rem; font-size: 0.85rem; }
-
 
       .account-item {
         flex-wrap: wrap;
@@ -552,13 +630,10 @@
       .account-item .account-detail { font-size: 0.75rem; }
       .account-item .account-actions { margin-left: auto; }
 
-
       .strategy-options { flex-direction: column; gap: 0.5rem; }
       .strategy-options label { font-size: 0.82rem; }
 
-
       .subsection-heading { font-size: 0.88rem; margin-top: 1rem; }
-
 
       /* Mobile fullscreen results */
       #results-section.mobile-focus {
@@ -573,9 +648,7 @@
         display: block;
       }
 
-
       #back-btn { display: inline-block; }
-
 
       .results-layout {
         flex-direction: column;
@@ -590,14 +663,20 @@
       .stat-card .stat-value { font-size: 1rem; }
       .stat-card .stat-label { font-size: 0.7rem; }
 
-
       .chart-container {
         height: 280px;
       }
 
+      .action-btns .btn { font-size: 0.9rem; padding: 0.6rem; }
 
-      #run-btn { font-size: 0.9rem; padding: 0.6rem; }
-
+      .comparison-grid { gap: 0.5rem; }
+      .comparison-panel { min-width: 130px; }
+      .comparison-panel-header .strategy-name { font-size: 0.78rem; }
+      .comparison-panel-header .strategy-sublabel { font-size: 0.62rem; }
+      .comparison-stat .stat-value { font-size: 0.82rem; }
+      .comparison-stat .stat-label { font-size: 0.65rem; }
+      .comparison-panel-stats { padding: 0.4rem; gap: 0.3rem; }
+      .comparison-stat { padding: 0.35rem 0.4rem; }
 
       .mobile-footer {
         position: fixed;
@@ -613,10 +692,8 @@
         z-index: 10;
       }
 
-
       body { padding-bottom: 3.5rem; }
     }
-
 
     /* Hide mobile footer on desktop */
     @media (min-width: 641px) {
@@ -625,7 +702,6 @@
   </style>
 </head>
 <body>
-
 
 <header>
   <button id="drawer-toggle" class="drawer-toggle" aria-label="Open info panel">
@@ -640,7 +716,6 @@
   <p>Enter your debts, pick a strategy, and see your path to debt-freedom.</p>
 </header>
 
-
 <div id="drawer-overlay" class="drawer-overlay"></div>
 <div id="drawer-panel" class="drawer-panel">
   <button id="drawer-close" class="drawer-close" aria-label="Close panel">&times;</button>
@@ -651,12 +726,9 @@
   </div>
 </div>
 
-
 <footer id="mobile-footer" class="mobile-footer">
   <p>Additional tips and insights will appear here based on your simulation results.</p>
 </footer>
-
-
 
 
 <div class="page-layout">
@@ -690,41 +762,46 @@
         </div>
       </form>
 
-
       <h3 class="subsection-heading">Payoff Strategy</h3>
       <div class="strategy-options">
-        <label><input type="radio" name="strategy" value="highest-interest" checked> Highest Interest First (Avalanche)</label>
-        <label><input type="radio" name="strategy" value="lowest-balance"> Lowest Balance First (Snowball)</label>
+        <label><input type="radio" name="strategy" value="lowest-balance" checked> Lowest Balance First (Snowball)</label>
+        <label><input type="radio" name="strategy" value="highest-interest"> Highest Interest First (Avalanche)</label>
         <label><input type="radio" name="strategy" value="highest-balance"> Highest Balance First</label>
+        <label class="strategy-custom"><input type="radio" name="strategy" value="custom"> Custom Order <span class="custom-info-wrap"><button type="button" class="custom-info-icon" id="custom-info-btn" aria-label="About custom order">&#x24D8;</button><span class="custom-tooltip" id="custom-tooltip">Drag the accounts to rearrange them.</span></span></label>
       </div>
     </div>
-
 
     <div class="card">
-      <button id="run-btn" class="btn btn-primary">Run Simulation</button>
-    </div>
-
-
-    <div id="results-section" class="card">
-  <div class="results-header">
-    <h2>Results</h2>
-    <button id="back-btn" class="btn btn-ghost btn-sm">&#8592; Back to Setup</button>
-  </div>
-  <div class="results-layout">
-    <div class="summary-column" id="summary-stats"></div>
-    <div class="chart-column">
-      <div class="chart-container">
-        <canvas id="payoff-chart"></canvas>
+      <div class="action-btns">
+        <button id="run-btn" class="btn btn-primary">Run Simulation</button>
+        <button id="compare-btn" class="btn btn-ghost">Show Comparison</button>
       </div>
     </div>
-  </div>
-</div>
 
+    <div id="results-section" class="card">
+      <div class="results-header">
+        <h2 id="results-title">Results</h2>
+        <button id="back-btn" class="btn btn-ghost btn-sm">&#8592; Back to Setup</button>
+      </div>
+      <div id="sim-view">
+        <div class="results-layout">
+          <div class="summary-column" id="summary-stats"></div>
+          <div class="chart-column">
+            <div class="chart-container">
+              <canvas id="payoff-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="compare-view" style="display:none">
+        <div id="compare-panels"></div>
+      </div>
+    </div>
 
   </div><!-- /.main-column -->
 
-
-  <aside class="sidebar">
+  <aside class="sidebar" id="desktop-sidebar">
+    <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close panel">&times;</button>
     <div class="sidebar-top">
       <p>This panel will display detailed account-by-account breakdowns, including individual payoff dates, total interest per account, and monthly payment schedules. Use it to compare how different strategies affect each debt and to identify which accounts benefit most from accelerated payments.</p>
     </div>
@@ -733,7 +810,6 @@
     </div>
   </aside>
 </div><!-- /.page-layout -->
-
 
 <div id="info-modal-overlay" class="info-modal-overlay">
   <div id="info-modal" class="info-modal">
@@ -746,20 +822,19 @@
   </div>
 </div>
 
-
 <script>
   // --- State ---
   let accounts = [];
-  let strategy = "highest-interest";
+  let strategy = "lowest-balance";
+  let customOrder = []; // stored account IDs in the last user-dragged order
   let editingId = null;
   let payoffChart = null;
-
+  let sidebarVisible = true;
 
   // --- Persistence ---
   function saveState() {
-    localStorage.setItem("debtPlanner", JSON.stringify({ accounts, strategy }));
+    localStorage.setItem("debtPlanner", JSON.stringify({ accounts, strategy, customOrder }));
   }
-
 
   function loadState() {
     try {
@@ -768,9 +843,9 @@
       const s = JSON.parse(raw);
       if (Array.isArray(s.accounts)) accounts = s.accounts;
       if (s.strategy) strategy = s.strategy;
+      if (Array.isArray(s.customOrder)) customOrder = s.customOrder;
     } catch (e) { /* ignore corrupt data */ }
   }
-
 
   // --- DOM refs ---
   const form = document.getElementById("account-form");
@@ -783,9 +858,12 @@
   const cancelBtn = document.getElementById("cancel-edit");
   const accountList = document.getElementById("account-list");
   const runBtn = document.getElementById("run-btn");
+  const compareBtn = document.getElementById("compare-btn");
   const resultsSection = document.getElementById("results-section");
+  const resultsTitle = document.getElementById("results-title");
+  const simView = document.getElementById("sim-view");
+  const compareView = document.getElementById("compare-view");
   const summaryStats = document.getElementById("summary-stats");
-
 
   // --- Account CRUD ---
   function addOrUpdateAccount() {
@@ -794,10 +872,8 @@
     const apr = parseFloat(aprInput.value) / 100;
     const minPayment = parseFloat(paymentInput.value);
 
-
     if (!name || isNaN(balance) || isNaN(apr) || isNaN(minPayment)) return;
     if (balance <= 0 || minPayment <= 0 || apr < 0) return;
-
 
     const monthlyInterest = balance * (apr / 12);
     if (minPayment <= monthlyInterest && apr > 0) {
@@ -806,9 +882,7 @@
       return;
     }
 
-
     formWarning.style.display = "none";
-
 
     if (editingId) {
       const idx = accounts.findIndex(a => a.id === editingId);
@@ -820,20 +894,17 @@
       accounts.push({ id: crypto.randomUUID(), name, balance, apr, minPayment });
     }
 
-
     form.reset();
     renderAccountList();
     saveState();
     form.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-
   function deleteAccount(id) {
     accounts = accounts.filter(a => a.id !== id);
     renderAccountList();
     saveState();
   }
-
 
   function startEdit(id) {
     const acc = accounts.find(a => a.id === id);
@@ -848,7 +919,6 @@
     nameInput.focus();
   }
 
-
   function cancelEdit() {
     editingId = null;
     form.reset();
@@ -856,7 +926,6 @@
     cancelBtn.style.display = "none";
     formWarning.style.display = "none";
   }
-
 
   // --- Render Account List ---
   function renderAccountList() {
@@ -881,17 +950,14 @@
     });
   }
 
-
   function escapeHtml(str) {
     const d = document.createElement("div");
     d.textContent = str;
     return d.innerHTML;
   }
 
-
   // --- Drag and Drop ---
   let dragId = null;
-
 
   accountList.addEventListener("dragstart", e => {
     const li = e.target.closest(".account-item");
@@ -901,14 +967,12 @@
     e.dataTransfer.effectAllowed = "move";
   });
 
-
   accountList.addEventListener("dragend", e => {
     const li = e.target.closest(".account-item");
     if (li) li.classList.remove("dragging");
     accountList.querySelectorAll(".drag-over").forEach(el => el.classList.remove("drag-over"));
     dragId = null;
   });
-
 
   accountList.addEventListener("dragover", e => {
     e.preventDefault();
@@ -920,7 +984,6 @@
     }
   });
 
-
   accountList.addEventListener("drop", e => {
     e.preventDefault();
     if (!dragId) return;
@@ -928,9 +991,7 @@
     const dragIndex = accounts.findIndex(a => a.id === dragId);
     if (dragIndex === -1) return;
 
-
     const [moved] = accounts.splice(dragIndex, 1);
-
 
     if (afterEl) {
       const afterId = afterEl.dataset.id;
@@ -940,17 +1001,19 @@
       accounts.push(moved);
     }
 
+    customOrder = accounts.map(a => a.id);
+    strategy = "custom";
+    const customRadio = document.querySelector('input[name="strategy"][value="custom"]');
+    if (customRadio) customRadio.checked = true;
 
     renderAccountList();
     saveState();
   });
 
-
   function getDragAfterElement(container, y) {
     const items = [...container.querySelectorAll(".account-item:not(.dragging)")];
     let closest = null;
     let closestOffset = Number.NEGATIVE_INFINITY;
-
 
     for (const item of items) {
       const box = item.getBoundingClientRect();
@@ -963,7 +1026,6 @@
     return closest;
   }
 
-
   // --- Event delegation for edit/delete ---
   accountList.addEventListener("click", e => {
     const li = e.target.closest(".account-item");
@@ -973,25 +1035,20 @@
     if (e.target.matches(".btn-edit")) startEdit(id);
   });
 
-
   // --- Simulation Engine ---
   function runSimulation(accs, strat) {
     const debts = accs.map(a => ({ ...a, paid: false }));
     const prioritized = sortByStrategy(debts, strat);
-
 
     const timeline = [];
     let totalInterest = 0;
     let month = 0;
     const MAX_MONTHS = 600;
 
-
     timeline.push(snapshot(month, prioritized));
-
 
     while (hasUnpaidDebts(prioritized) && month < MAX_MONTHS) {
       month++;
-
 
       // Phase 1: accrue interest
       for (const d of prioritized) {
@@ -1000,7 +1057,6 @@
         d.balance += interest;
         totalInterest += interest;
       }
-
 
       // Phase 2: apply payments in priority order
       // Every unpaid account makes its minimum payment.
@@ -1014,14 +1070,12 @@
           continue;
         }
 
-
         let payment = d.minPayment;
         if (firstUnpaid) {
           payment += rollover;
           rollover = 0;
           firstUnpaid = false;
         }
-
 
         if (payment >= d.balance) {
           rollover += payment - d.balance;
@@ -1032,18 +1086,14 @@
         }
       }
 
-
       timeline.push(snapshot(month, prioritized));
     }
-
 
     const accountNames = {};
     for (const a of accs) accountNames[a.id] = a.name;
 
-
     return { timeline, totalInterest, totalMonths: month, accountNames };
   }
-
 
   function sortByStrategy(debts, strat) {
     const copy = [...debts];
@@ -1055,18 +1105,15 @@
     return copy;
   }
 
-
   function snapshot(month, debts) {
     const balances = {};
     for (const d of debts) balances[d.id] = Math.max(0, parseFloat(d.balance.toFixed(2)));
     return { month, balances };
   }
 
-
   function hasUnpaidDebts(debts) {
     return debts.some(d => !d.paid);
   }
-
 
   // --- Chart Rendering ---
   const COLORS = [
@@ -1074,11 +1121,9 @@
     "#ec4899", "#06b6d4", "#f97316", "#6366f1", "#14b8a6"
   ];
 
-
   function renderChart(result) {
     const { timeline, accountNames } = result;
     const ids = Object.keys(timeline[0].balances);
-
 
     const datasets = ids.map((id, i) => ({
       label: accountNames[id],
@@ -1092,9 +1137,7 @@
       borderWidth: 2.5
     }));
 
-
     if (payoffChart) payoffChart.destroy();
-
 
     payoffChart = new Chart(document.getElementById("payoff-chart"), {
       type: "line",
@@ -1132,18 +1175,15 @@
     });
   }
 
-
   // --- Summary ---
   function renderSummary(result) {
     const { totalMonths, totalInterest } = result;
     const startingDebt = accounts.reduce((s, a) => s + a.balance, 0);
     const totalPaid = startingDebt + totalInterest;
 
-
     const freeDate = new Date();
     freeDate.setMonth(freeDate.getMonth() + totalMonths);
     const dateStr = freeDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-
 
     summaryStats.innerHTML = `
       <div class="stat-card">
@@ -1169,6 +1209,85 @@
     `;
   }
 
+  // --- Comparison Rendering ---
+  function renderComparison() {
+    const strategies = [
+      { key: "lowest-balance",   label: "Snowball",        sublabel: "Lowest Balance First",  color: "#2563eb" },
+      { key: "highest-interest", label: "Avalanche",       sublabel: "Highest Interest First", color: "#dc2626" },
+      { key: "highest-balance",  label: "Highest Balance", sublabel: "Highest Balance First",  color: "#16a34a" },
+    ];
+    if (customOrder.length > 0) {
+      strategies.push({ key: "custom", label: "Custom Order", sublabel: "", color: "#8b5cf6" });
+    }
+
+    const startingDebt = accounts.reduce((s, a) => s + a.balance, 0);
+
+    function fmt(n) {
+      return "$" + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    const results = strategies.map(strat => {
+      let accsForSim = accounts;
+      if (strat.key === "custom") {
+        accsForSim = [...accounts].sort((a, b) => {
+          const ai = customOrder.indexOf(a.id);
+          const bi = customOrder.indexOf(b.id);
+          return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+        });
+      }
+      const sim = runSimulation(accsForSim, strat.key);
+      const freeDate = new Date();
+      freeDate.setMonth(freeDate.getMonth() + sim.totalMonths);
+      return {
+        strat,
+        totalMonths: sim.totalMonths,
+        totalInterest: sim.totalInterest,
+        totalPaid: startingDebt + sim.totalInterest,
+        dateStr: freeDate.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+        startingDebt
+      };
+    });
+
+    // Find lowest interest for "best" highlight
+    const minInterest = Math.min(...results.map(r => r.totalInterest));
+
+    const panelsHtml = results.map(r => {
+      const isBest = r.totalInterest === minInterest;
+      return `
+        <div class="comparison-panel${isBest ? " best-panel" : ""}">
+          <div class="comparison-panel-header" style="background:${r.strat.color}">
+            <div class="strategy-name">${r.strat.label}</div>
+            ${r.strat.sublabel ? `<div class="strategy-sublabel">${r.strat.sublabel}</div>` : ""}
+          </div>
+          <div class="comparison-panel-stats">
+            <div class="comparison-stat">
+              <div class="stat-value">${r.totalMonths}</div>
+              <div class="stat-label">Months to Debt-Free</div>
+            </div>
+            <div class="comparison-stat">
+              <div class="stat-value">${r.dateStr}</div>
+              <div class="stat-label">Debt-Free Date</div>
+            </div>
+            <div class="comparison-stat">
+              <div class="stat-value">${fmt(r.startingDebt)}</div>
+              <div class="stat-label">Starting Debt</div>
+            </div>
+            <div class="comparison-stat">
+              <div class="stat-value">${fmt(r.totalInterest)}</div>
+              <div class="stat-label">Total Interest Paid</div>
+            </div>
+            <div class="comparison-stat">
+              <div class="stat-value">${fmt(r.totalPaid)}</div>
+              <div class="stat-label">Total Amount Paid</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    document.getElementById("compare-panels").innerHTML =
+      `<div class="comparison-grid">${panelsHtml}</div>`;
+  }
 
   // --- Event Wiring ---
   form.addEventListener("submit", e => {
@@ -1176,44 +1295,46 @@
     addOrUpdateAccount();
   });
 
-
   cancelBtn.addEventListener("click", cancelEdit);
-
 
   document.querySelectorAll('input[name="strategy"]').forEach(r => {
     r.addEventListener("change", e => {
       strategy = e.target.value;
-      accounts = sortByStrategy(accounts, strategy);
+      if (strategy === "custom" && customOrder.length > 0) {
+        // Restore the last dragged order
+        accounts.sort((a, b) => {
+          const ai = customOrder.indexOf(a.id);
+          const bi = customOrder.indexOf(b.id);
+          // IDs not in customOrder (e.g. newly added accounts) go to the end
+          return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+        });
+      } else {
+        accounts = sortByStrategy(accounts, strategy);
+      }
       renderAccountList();
       saveState();
     });
   });
 
-
   function isMobile() {
     return window.matchMedia("(max-width: 640px)").matches;
   }
-
 
   // --- Info Modal ---
   const infoModalOverlay = document.getElementById("info-modal-overlay");
   const infoModalClose = document.getElementById("info-modal-close");
 
-
   function hasSeenInfoModal() {
     return localStorage.getItem("debtPlanner_infoSeen") === "true";
   }
-
 
   function markInfoModalSeen() {
     localStorage.setItem("debtPlanner_infoSeen", "true");
   }
 
-
   function showInfoModal(onDismiss) {
     infoModalOverlay.classList.add("open");
     document.body.style.overflow = "hidden";
-
 
     function dismiss() {
       infoModalOverlay.classList.remove("open");
@@ -1222,10 +1343,27 @@
       onDismiss();
     }
 
-
     infoModalClose.addEventListener("click", dismiss);
   }
 
+  function showResultsMobile(onReady) {
+    shimmerIcon();
+    setTimeout(() => {
+      if (!hasSeenInfoModal()) {
+        showInfoModal(() => {
+          resultsSection.style.display = "block";
+          resultsSection.classList.add("mobile-focus");
+          document.body.style.overflow = "hidden";
+          if (onReady) onReady();
+        });
+      } else {
+        resultsSection.style.display = "block";
+        resultsSection.classList.add("mobile-focus");
+        document.body.style.overflow = "hidden";
+        if (onReady) onReady();
+      }
+    }, SHIMMER_MS);
+  }
 
   runBtn.addEventListener("click", () => {
     if (accounts.length === 0) {
@@ -1235,48 +1373,64 @@
     const result = runSimulation(accounts, strategy);
     renderSummary(result);
     renderChart(result);
-
+    simView.style.display = "block";
+    compareView.style.display = "none";
+    resultsTitle.textContent = "Results";
 
     if (isMobile()) {
-      const icon = document.getElementById("drawer-toggle");
-      icon.classList.remove("shimmer");
-      void icon.offsetWidth;
-      icon.classList.add("shimmer");
-
-
-      icon.addEventListener("animationend", () => {
-        icon.classList.remove("shimmer");
-        if (!hasSeenInfoModal()) {
-          showInfoModal(() => {
-            resultsSection.style.display = "block";
-            resultsSection.classList.add("mobile-focus");
-            document.body.style.overflow = "hidden";
-          });
-        } else {
-          resultsSection.style.display = "block";
-          resultsSection.classList.add("mobile-focus");
-          document.body.style.overflow = "hidden";
-        }
-      }, { once: true });
+      showResultsMobile();
     } else {
-      resultsSection.style.display = "block";
-      resultsSection.scrollIntoView({ behavior: "smooth" });
+      if (!sidebarVisible) {
+        shimmerIcon();
+        setTimeout(() => {
+          resultsSection.style.display = "block";
+          resultsSection.scrollIntoView({ behavior: "smooth" });
+        }, SHIMMER_MS);
+      } else {
+        resultsSection.style.display = "block";
+        resultsSection.scrollIntoView({ behavior: "smooth" });
+      }
     }
   });
 
+  compareBtn.addEventListener("click", () => {
+    if (accounts.length === 0) {
+      alert("Add at least one debt account first.");
+      return;
+    }
+    renderComparison();
+    simView.style.display = "none";
+    compareView.style.display = "block";
+    resultsTitle.textContent = "Strategy Comparison";
+
+    if (isMobile()) {
+      showResultsMobile();
+    } else {
+      if (!sidebarVisible) {
+        shimmerIcon();
+        setTimeout(() => {
+          resultsSection.style.display = "block";
+          resultsSection.scrollIntoView({ behavior: "smooth" });
+        }, SHIMMER_MS);
+      } else {
+        resultsSection.style.display = "block";
+        resultsSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  });
 
   document.getElementById("back-btn").addEventListener("click", () => {
     resultsSection.classList.remove("mobile-focus");
     document.body.style.overflow = "";
   });
 
-
   // --- Mobile Drawer ---
   const drawerToggle = document.getElementById("drawer-toggle");
   const drawerPanel = document.getElementById("drawer-panel");
   const drawerOverlay = document.getElementById("drawer-overlay");
   const drawerClose = document.getElementById("drawer-close");
-
+  const desktopSidebar = document.getElementById("desktop-sidebar");
+  const sidebarCloseBtn = document.getElementById("sidebar-close-btn");
 
   function openDrawer() {
     if (!isMobile()) return;
@@ -1285,18 +1439,60 @@
     document.body.style.overflow = "hidden";
   }
 
-
   function closeDrawer() {
     drawerPanel.classList.remove("open");
     drawerOverlay.classList.remove("open");
     document.body.style.overflow = "";
   }
 
+  const SHIMMER_MS = 820; // matches the 0.8s CSS animation
 
-  drawerToggle.addEventListener("click", openDrawer);
+  function shimmerIcon() {
+    const icon = document.getElementById("drawer-toggle");
+    icon.classList.remove("shimmer");
+    void icon.offsetWidth;
+    icon.classList.add("shimmer");
+    setTimeout(() => icon.classList.remove("shimmer"), SHIMMER_MS);
+  }
+
+  function closeSidebar() {
+    sidebarVisible = false;
+    desktopSidebar.style.display = "none";
+    drawerToggle.classList.add("desktop-active");
+    shimmerIcon();
+  }
+
+  function openSidebar() {
+    sidebarVisible = true;
+    desktopSidebar.style.display = "";
+    drawerToggle.classList.remove("desktop-active");
+  }
+
+  drawerToggle.addEventListener("click", () => {
+    if (isMobile()) {
+      openDrawer();
+    } else if (!sidebarVisible) {
+      openSidebar();
+    }
+  });
   drawerClose.addEventListener("click", closeDrawer);
   drawerOverlay.addEventListener("click", closeDrawer);
+  sidebarCloseBtn.addEventListener("click", closeSidebar);
 
+  // --- Custom Order Info Tooltip ---
+  const customInfoBtn = document.getElementById("custom-info-btn");
+  const customTooltip = document.getElementById("custom-tooltip");
+
+  customInfoBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    customTooltip.classList.toggle("pinned");
+  });
+
+  document.addEventListener("click", e => {
+    if (!customInfoBtn.contains(e.target)) {
+      customTooltip.classList.remove("pinned");
+    }
+  });
 
   // --- Init ---
   loadState();
@@ -1304,12 +1500,12 @@
   if (stratRadio) stratRadio.checked = true;
   renderAccountList();
 
-
   if (isMobile()) {
-    const icon = document.getElementById("drawer-toggle");
-    icon.classList.add("shimmer");
-    icon.addEventListener("animationend", () => icon.classList.remove("shimmer"), { once: true });
+    shimmerIcon();
   }
 </script>
 </body>
 </html>
+
+
+
